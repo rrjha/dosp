@@ -1,0 +1,40 @@
+Minutes
+
+rest/http for high level (socket based)
+
+async. 1 RS(transient server)—data validation
+						enqueues
+						replies MAX_CAPACITY
+
+			queue of fixed MAX_Length
+
+ ….dispatcher dequeues and calls handler synch.
+	1 handler per service
+		service handler calls sensor routine	
+	dispatcher is owner of return value via socket info (Rx from daemon)
+
+
+		
+
+POTENTIAL - call async  using 1 process per service/sensor
+	pros - parallelism
+	cons - sync
+		- low expoected request volume
+		- difficult to implement
+
+
+
+next meeting agenda/tasks
+
+sensor research
+	temp/gyro
+project specs
+	bbb
+	soc
+
+read BBB handling of
+	interrupt
+	memory
+upload relevant docs
+source control base code
+
