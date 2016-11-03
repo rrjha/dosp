@@ -1,0 +1,13 @@
+src/compile/binaries/
+src/compile/xinu
+src/compile/xinu.bin
+src/compile/xinu.elf
+src/config/config
+src/config/lex.yy.c
+src/config/y.tab.c
+src/include/conf.h
+src/system/conf.c
+src/compile/.defs
+src/compile/.vers_num
+src/compile/version
+
