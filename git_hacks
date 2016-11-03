@@ -1,4 +1,6 @@
 
+#Use only with EXTREME CAUTION
+
 #Ignore all untracked changes in the repository
 git status --porcelain | grep '^??' | cut -c4- >> .gitignore
 
