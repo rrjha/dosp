@@ -8,5 +8,5 @@ Modified Xinu for BBB
 Requirements
 ============
 
-#. i386 Linux to run the provided cross-compiler
-#. Python 3.5
+0. i386 Linux to run the provided cross-compiler
+0. Python 3.5
