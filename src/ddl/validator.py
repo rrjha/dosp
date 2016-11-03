@@ -7,18 +7,51 @@ operation_classes = ("Input", "Output")
 operation_types = ("Analog", "Digital", "Protocol", "Logical")
 number_classes = ("Single", "Multiple")
 allowed_status = ("INIT", "BINDED", "ALIGNED", "EXEC", "TERMINATE", "EMERGENCY", "ERROR", "ALL")
+reading_type = ("Basic", "Derived", "Physical")
+computation_type = ("Aggregate", "Formula", "Map")
 
-def check_param(elem):
-  pass
+def check_computation(elem):
+  types = elem.findall("Type")
+  assert len(types) == 1, "Must have a computation type"
+  assert types[0] in computation_type, "Unknown computation type"
+  expressions = elem.findall("Expression")
+  assert len(expressions) <= 1, "At most one Expression"
 
 def check_reading(elem):
-  pass
+  types = elem.findall("Type")
+  assert len(types) == 1, "Must have one Type"
+  assert types[0] in reading_type, "Reading Type unknown"
+  measurements = elem.findall("Measurement")
+  assert len(measurements) == 1, "Must have one Measurement"
+  units = elem.findall("Unit")
+  assert len(units) <= 1, "May have at most one Unit"
+  ranges = elem.findall("Range")
+  assert len(ranges) <= 1, "At most one Range"
+  check_range(ranges[0])
+  computations = elem.findall("Computation")
+  assert len(computations) <= 1, "At most one Computation"
+  if computations:
+    check_computation(computations[0])
 
 def check_id(elem):
   pass #Not defined
 
 def check_location(elem):
   pass #Not defined
+
+def check_param(elem):
+  parameter_names = elem.findall("Parameter_name")
+  assert len(parameter_names) == 1, "Parameter name is required"
+  parameter_name = parameter_names[0]
+  assert parameter_name.text.strip(), "Parameter name cannot be empty"
+  chars = elem.findall("Parameter_characterization")
+  for char in chars:
+    ids = char.findall("id")
+    enu = char.findall("enumeration")
+    dis = char.findall("discrete")
+    assert len(ids) == 1
+    assert len(enu) == 1
+    assert len(dis) == 1
 
 def check_signal(elem):
   operations = elem.findall("Operation")
