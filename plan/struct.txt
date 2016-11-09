@@ -1,0 +1,31 @@
+struct msg
+{
+  uint8 type; //0 = publish, 1 = subscribe, other values left undefined for future expansions
+  uint8 class; //Format class of the data field (temp=0, accel=1, sleep=2,...)
+  uint8 group; //Broad topic, we set to 0 in this project, allows structure to be used when 256 subjects is not enough
+  uint8 topic; //'Topic' from our assignments (temp=0, accel=1, sleep=2,...)
+  uint8 src; //Source ID, set dynamically by server only. Always set to 255 by BBB, 255 means no source. Server sets 
+this field for all messages traveling through it
+  uint8 data[64]; //class-defined data items, length is set to make the entire structure byte-addressable
+};
+
+uint8 is chosen as basic type such that we don't have to define endianess or byte order. 
+
+The format of the data field by format class shall be:
+
+Temperature:
+
+32-bit signed integer temperature in Celsius. Remainder of data field undefined.
+
+AccelEvent:
+
+32-bit signed integer X, Y, Z. Remainder of data field undefined. 
+
+Sleep:
+
+32-bit signed integer, (awake=0, asleep=1), indicating sleep status as determined by the sensor. 32-bit chosen here 
+for consistency.
+
+Requesting feedback! Try not to nit-pick smaller details as we must come to an agreement promptly. Focus was 
+simplicity with expandibility.
+
