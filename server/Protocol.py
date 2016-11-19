@@ -9,8 +9,10 @@ class Protocol(asyncio.DatagramProtocol):
     self.loop = loop
     self.transport = None
     self.write_lock = asyncio.Lock()
+    self.buf = bytearray()
 
   def connection_made(self, transport):
+    """Passes in the transport from asyncio, otherwise vestigial because UDP is connectionless"""
     self.transport = transport
 
   def datagram_received(self, data, addr):
