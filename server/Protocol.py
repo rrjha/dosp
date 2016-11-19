@@ -3,7 +3,7 @@ import asyncio
 
 from util import dp
 
-class ServerProtocol(asyncio.DatagramProtocol):
+class Protocol(asyncio.DatagramProtocol):
 
   def __init__(self, loop):
     self.loop = loop
@@ -17,7 +17,7 @@ class ServerProtocol(asyncio.DatagramProtocol):
     dp("Got some data from %s", addr)
 
   def pause_writing(self):
-    loop.call_soon(self.write_lock.acquire)
+    loop.create_task(self.write_lock.acquire())
 
   def resume_writing(self):
     self.write_lock.release()

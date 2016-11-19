@@ -2,7 +2,7 @@
 
 import asyncio
 
-from ServerProtocol import ServerProtocol
+from Protocol import Protocol
 from util import dp
 
 def main():
@@ -11,10 +11,10 @@ def main():
 
   dp("Building datagram endpoint (UDP)")
   listen = loop.create_datagram_endpoint(
-	lambda: ServerProtocol(loop), local_addr=("0.0.0.0", 5154))
-  transport, protocol = loop.run_until_complete(listen)
+	lambda: Protocol(loop), local_addr=("0.0.0.0", 5154))
+  transport, _ = loop.run_until_complete(listen)
+  transport.set_write_buffer_limits(10000, 0)
   dp(transport)
-  dp(protocol)
 
   dp("Entering the event loop")
   try:
