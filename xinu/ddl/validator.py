@@ -53,6 +53,8 @@ def check_param(elem):
     assert len(enu) == 1
     assert len(dis) == 1
 
+check_param = lambda x: True
+
 def check_signal(elem):
   operations = elem.findall("Operation")
   assert len(operations) == 1, "Must be exactly one operation mode"
@@ -77,7 +79,8 @@ def check_signal(elem):
   number = numbers[0]
   range = ranges[0]
   assert number.text in number_classes, "Number class (Single, Multiple) not recognized"
-  check_range(range)
+  if range:
+    check_range(range)
   if methods:
     method = methods[0]
     assert method.text, "Empty method name"
