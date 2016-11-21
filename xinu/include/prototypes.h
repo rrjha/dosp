@@ -520,6 +520,12 @@ extern devcall adcinit (struct	dentry *);
 /* in file adcread.c */
 extern devcall adcread (struct dentry *, int32 *, int32);
 
+/* in file gpio.c */
+extern devcall gpioinit (struct	dentry *);
+extern devcall gpioctl (struct dentry *, uint32, uint32, uint32);
+extern devcall gpiowrite (struct dentry *, uint32, uint32);
+extern devcall gpioread (struct dentry *, uint32, uint32);
+
 /* in file start.S */
 extern	int32	inb(int32);
 extern	int32	inw(int32);
