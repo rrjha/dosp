@@ -12,7 +12,7 @@ devcall	adcread(
 	  int32	pin 			    /* ADC pin to read - AIN1 only  */
 	)
 {
-	struct	adc_csreg *adcreg = (struct	adc_csreg *)devptr->dvcsr;
+    struct adc_csreg *adcreg = (struct	adc_csreg *)devptr->dvcsr;
     int32 retries = 6;
     uint32 sample = 0;
     uint32 stepconfval = (ADC_STEP_CONFIG_VAL | (pin << ADC_CHANNEL_START_POS));
@@ -46,4 +46,5 @@ devcall	adcread(
     else
         return SYSERR;
 
+    return OK;
 }
