@@ -2,7 +2,10 @@
 import asyncio
 
 from util import dp
-from Message import msg_fmt, unpack_msg
+from Message import msg_fmt, unpack_msg, pack_msg, mtype
+from Database import Database
+
+db = Database()
 
 class Protocol(asyncio.DatagramProtocol):
 
@@ -26,14 +29,39 @@ class Protocol(asyncio.DatagramProtocol):
     if len(b) >= s_size:
       p = b[0:s_size]
       self.bufs[addr] = b[s_size:]
-      self.handle(unpack_msg(data))
+      try:
+        self.loop.create_task(self.handle(unpack_msg(p), addr))
+      except Exception as e:
+        dp("Caught exception when attempting to handle message from " + addr)
+        dp(e.printStackTrace())
 
   def pause_writing(self):
-    loop.create_task(self.write_lock.acquire())
+    self.loop.create_task(self.write_lock.acquire())
 
   def resume_writing(self):
     self.write_lock.release()
 
-  def handle(self, data):
-    pass #TODO implement handle message using database
+  async def handle(self, msg, addr):
+    m_type = msg["type"]
+    if m_type == mtype.ENTER:
+      dp("Got ENTER from " + addr)
+      db.map_ip(addr)
+    elif m_type == mtype.LEAVE:
+      dp("Got LEAVE from " + addr)
+      db.drop_id(db.get_id(addr))
+    elif m_type == mtype.PUBLISH:
+      dp("Got PUBLISH from " + addr)
+      ips = db.get_subs_ips(msg["topic"])
+      db.log_message(msg)
+      await self.write_lock.acquire()
+      for ip in ips:
+        msg["src"] = db.get_id(addr)
+        self.transport.send(pack_msg(msg), ip)
+        dp("Forwarded message to " + addr)
+      self.write_lock.release()
+    elif m_type == mtype.SUBSCRIBE:
+      dp("Got SUBSCRIBE from " + addr)
+      db.subscribe(db.get_id(addr), msg["topic"])
+    else:
+      dp("Unknown message type")
 
