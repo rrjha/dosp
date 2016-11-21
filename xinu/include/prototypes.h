@@ -514,6 +514,12 @@ extern	devcall	spicontrol(struct dentry *, int32, int32, int32);
 /* in spiinit.c */
 extern	int32	spiinit(struct dentry *);
 
+/* in file adcinit.c */
+extern devcall adcinit (struct	dentry *);
+
+/* in file adcread.c */
+extern devcall adcread (struct dentry *, int32 *, int32);
+
 /* in file start.S */
 extern	int32	inb(int32);
 extern	int32	inw(int32);
