@@ -65,7 +65,7 @@ struct adc_csreg {
 	reg32 dma1req;			/*	F8h	*/
 	reg32 reserved3;
 	reg32 fifo0data;		/*	100h*/
-	reg32 fifo1data			/*	200h*/
+	reg32 fifo1data;		/*	200h*/
 };
 
 
