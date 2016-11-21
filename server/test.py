@@ -1,7 +1,7 @@
 
 import doctest
 
-files = ["Database.py"]
+files = ["Database.py", "Message.py"]
 
 def main():
   flags = doctest.ELLIPSIS | doctest.IGNORE_EXCEPTION_DETAIL | doctest.FAIL_FAST
