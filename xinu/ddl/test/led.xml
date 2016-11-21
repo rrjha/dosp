@@ -42,12 +42,6 @@ is equal to the Reading->Measurement attribute of another physical/virtual senso
 <Unit></Unit>
 <!-- Number can be Single or Multiple (many signal inputs of same type) --> <Number>Single</Number>
 <Method_name>initLed</Method_name>
-<Parameter id="p1" enumeration="false" discrete="true">
-	<Parameter_name></Parameter_name>
-	<Parameter_characterization></Parameter_characterization>
-	<Parameter_characterization></Parameter_characterization>
-	<Parameter_characterization></Parameter_characterization>
-</Parameter>
 <Allowed_status>ALL</Allowed_status>
 <Range>
 <!-- leave blank if you don‟t know --> <Min></Min>
