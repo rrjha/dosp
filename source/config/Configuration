@@ -87,7 +87,7 @@ lfl:
 		-r lflread	-g lflgetc	-p lflputc
 		-w lflwrite	-s lflseek	-n lflcontrol
 		-intr ionull
-		
+
 /* type of namespace device */
 nam:
 	on top
@@ -101,6 +101,13 @@ spi:
 		-i spiinit	-o ionull	-c ionull
 		-r ionull	-g ionull	-p ionull
 		-w ionull	-s ionull	-n spicontrol
+		-intr ionull
+
+adc:
+	on top
+		-i adcinit	-o ionull	-c ionull
+		-r adcread	-g ionull	-p ionull
+		-w ionull	-s ionull	-n ionull
 		-intr ionull
 %%
 
@@ -121,10 +128,10 @@ spi:
 
    /* Define a remote disk system device */
    RDISK is rds on udp
-   
+
    /* Define a ram disk device */
    RAM0 is ram on mem
- 
+
    /* Define the remote file system device */
 
    RFILESYS is rfs on udp
@@ -141,7 +148,7 @@ spi:
    RFILE7 is rfl on rfs
    RFILE8 is rfl on rfs
    RFILE9 is rfl on rfs
-  
+
    /* Define the local file system master device (one per system) */
 
    LFILESYS is lfs on ram
@@ -159,6 +166,10 @@ spi:
 
    SPI0 is spi on top csr 0x48030000
    SPI1 is spi on top csr 0x481A0000
+
+   /* ADC is Analog to digital converter */
+
+   ADC is adc on top csr 0x44E0D000
 
 %%
 
