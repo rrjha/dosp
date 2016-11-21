@@ -7,6 +7,7 @@ import argparse
 import os
 
 from validator import validate
+from generator import generate
 
 def get_args():
   """Parse command line arguments to the utility"""
@@ -22,6 +23,7 @@ def main():
   print("Output Path: %s" % args['out_path']) 
   tree = ET.parse(args['driver_ddl'])
   validate(tree)
+  generate(tree)
 
 if __name__=='__main__':
   print("I'm main!")
