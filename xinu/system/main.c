@@ -4,20 +4,28 @@
 
 process	main(void)
 {
-
-	/* Run the Xinu shell */
-
+    struct setdir_combo dir = {16, EGPIO_DIR_OUTPUT};
+    struct write_combo wc = {16, 0x1};
 	recvclr();
-	resume(create(shell, 8192, 50, "shell", 1, CONSOLE));
 
-	/* Wait for shell to exit and recreate it */
+    init(GPIO);
+    control(GPIO, EMUXPIN, 0x840, 7);
+    control(GPIO, ESETDIR, AM335X_GPIO1_REGS, &dir);
 
-	while (TRUE) {
-		receive();
-		sleepms(200);
-		kprintf("\n\nMain process recreating shell\n\n");
-		resume(create(shell, 4096, 20, "shell", 1, CONSOLE));
-	}
+    while(1)
+    {
+        wc.pinValue = 0x1;
+        write(GPIO, AM335X_GPIO1_REGS, &wc);
+
+
+        sleep(10);
+
+        wc.pinValue = 0x0;
+        write(GPIO, AM335X_GPIO1_REGS, &wc);
+
+        sleep(5);
+    }
+
 	return OK;
-    
+
 }

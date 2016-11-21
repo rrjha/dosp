@@ -109,6 +109,13 @@ adc:
 		-r adcread	-g ionull	-p ionull
 		-w ionull	-s ionull	-n ionull
 		-intr ionull
+
+gpio:
+	on top
+		-i gpioinit	    -o ionull	-c ionull
+		-r gpioread	    -g ionull	-p ionull
+		-w gpiowrite    -s ionull	-n gpioctl
+		-intr ionull
 %%
 
 /* Actual device declarations that each give the name of a device that	*/
@@ -170,6 +177,10 @@ adc:
    /* ADC is Analog to digital converter */
 
    ADC is adc on top csr 0x44E0D000
+
+   /* GPIO */
+
+   GPIO is gpio on top csr 0x44E07000
 
 %%
 
