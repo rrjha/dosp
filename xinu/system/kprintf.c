@@ -95,3 +95,14 @@ syscall kprintf(char *fmt, ...)
     va_end(ap);
     return OK;
 }
+
+syscall print(char *fmt, ...)
+{
+    va_list ap;
+    intmask mask = disable();
+    va_start(ap, fmt);
+    _doprnt(fmt, ap, (int (*)(int))kputc, (int)&devtab[CONSOLE]);
+    va_end(ap);
+    restore(mask);
+    return OK;
+}

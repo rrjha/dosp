@@ -43,6 +43,7 @@ class Protocol(asyncio.DatagramProtocol):
 
   async def handle(self, msg, addr):
     m_type = msg["type"]
+    dp(msg)
     if m_type == mtype.ENTER:
       dp("Got ENTER from " + addr)
       db.map_ip(addr)
