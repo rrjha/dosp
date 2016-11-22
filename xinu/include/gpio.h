@@ -39,23 +39,23 @@ struct gpio_csreg {
 };
 
 /* GPIO ICLK - skip 0 */
-#define AM335X_GPIO1_CLKCTRL_ADDR	    0x44E000AC
-#define AM335X_GPIO2_CLKCTRL_ADDR	    0x44E000B0
-#define AM335X_GPIO3_CLKCTRL_ADDR	    0x44E000B4
-#define AM335X_GPIO_CLKCTRL_EN	            0x00000002
-#define AM335X_GPIO_CLKCTRL_EN_MASK         0x00000003
+#define AM335X_GPIO1_CLKCTRL_ADDR	0x44E000AC
+#define AM335X_GPIO2_CLKCTRL_ADDR	0x44E000B0
+#define AM335X_GPIO3_CLKCTRL_ADDR	0x44E000B4
+#define AM335X_GPIO_CLKCTRL_EN	        0x00000002
+#define AM335X_GPIO_CLKCTRL_EN_MASK     0x00000003
 
 /* GPIO Muxing - For Mux requests */
-#define AM335X_CONTROL_REGS                 0x44E10000
+#define AM335X_CONTROL_REGS             0x44E10000
 
 /* GPIO Bank addresses */
-#define AM335X_GPIO0_REGS                   0x44E07000
-#define AM335X_GPIO1_REGS                   0x4804C000
-#define AM335X_GPIO2_REGS                   0x481AC000
-#define AM335X_GPIO3_REGS                   0x481AE000
+#define AM335X_GPIO0_REGS               0x44E07000
+#define AM335X_GPIO1_REGS               0x4804C000
+#define AM335X_GPIO2_REGS               0x481AC000
+#define AM335X_GPIO3_REGS               0x481AE000
 
 
-enum EGPIO_OP
+enum EGPIO_FUNC
 {
     EMUXPIN,
     ESETDIR
@@ -66,14 +66,78 @@ enum EGPIO_DIR
     EGPIO_DIR_INPUT
 };
 
-/* Set direction requires 4 params So we
- * create a pin number dir combo as third param */
- struct setdir_combo {
-     uint32 pinNumber;
-     enum EGPIO_DIR pinDirection;
- };
+ /* GPIOs on BBB */
+ enum EBBB_GPIO {
+    EP8_3,
+    EP8_4,
+    EP8_5,
+    EP8_6,
+    EP8_7,
+    EP8_8,
+    EP8_9,
+    EP8_10,
+    EP8_11,
+    EP8_12,
+    EP8_13,
+    EP8_14,
+    EP8_15,
+    EP8_16,
+    EP8_17,
+    EP8_18,
+    EP8_19,
+    EP8_20,
+    EP8_21,
+    EP8_22,
+    EP8_23,
+    EP8_24,
+    EP8_25,
+    EP8_26,
+    EP8_27,
+    EP8_28,
+    EP8_29,
+    EP8_30,
+    EP8_31,
+    EP8_32,
+    EP8_33,
+    EP8_34,
+    EP8_35,
+    EP8_36,
+    EP8_37,
+    EP8_38,
+    EP8_39,
+    EP8_40,
+    EP8_41,
+    EP8_42,
+    EP8_43,
+    EP8_44,
+    EP8_45,
+    EP8_46,
+    EP9_11,
+    EP9_12,
+    EP9_13,
+    EP9_14,
+    EP9_15,
+    EP9_16,
+    EP9_17,
+    EP9_18,
+    EP9_21,
+    EP9_22,
+    EP9_23,
+    EP9_24,
+    EP9_25,
+    EP9_26,
+    EP9_27,
+    EP9_28,
+    EP9_29,
+    EP9_30,
+    EP9_31,
+    EP9_41,
+    EP9_42,
+    EGPIO_MAX
+    };
 
- struct write_combo {
+struct gpio_mapping {
     uint32 pinNumber;
-    uint32 pinValue;
- };
+    reg32 gpio_bank_addr;
+    uint32 control_offset;
+};
