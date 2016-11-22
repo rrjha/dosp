@@ -32,7 +32,7 @@ class Protocol(asyncio.DatagramProtocol):
       try:
         self.loop.create_task(self.handle(unpack_msg(p), addr))
       except Exception as e:
-        dp("Caught exception when attempting to handle message from " + addr)
+        dp("Caught exception while attempting to handle message from " + addr)
         dp(e.printStackTrace())
 
   def pause_writing(self):
