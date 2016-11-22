@@ -29,3 +29,26 @@ for consistency.
 Requesting feedback! Try not to nit-pick smaller details as we must come to an agreement promptly. Focus was 
 simplicity with expandibility.
 
+
+union Data {
+   msg m;
+   byte[sizeof(msg)] b;
+} data;
+
+
+++Xinu Socket example++
+active open (client):
+int dd = open(TCP, "128.171.10.1:333",
+              ANYLPORT);
+write(dd, buf, sizeof(buf));
+read(dd, buf, sizeof(buf));
+close(dd);
+passive open (server):
+int dd = open(TCP, ANYFPORT, MYPORT);
+control(dd, TCPCLISTENQ, size);
+while(1) {
+  dd2 = control(dd, TCPCACCEPT);
+  write(dd2, buf, sizeof(buf));
+  read(dd2, buf, sizeof(buf));
+  close(dd2);
+}
