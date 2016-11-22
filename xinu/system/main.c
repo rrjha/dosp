@@ -4,28 +4,26 @@
 
 process	main(void)
 {
-    struct setdir_combo dir = {16, EGPIO_DIR_OUTPUT};
-    struct write_combo wc = {16, 0x1};
 	recvclr();
 
+	/* Initialize the GPIO module */
     init(GPIO);
-    control(GPIO, EMUXPIN, 0x840, 7);
-    control(GPIO, ESETDIR, AM335X_GPIO1_REGS, &dir);
+
+    /* Set the P9-15 pin as output pin */
+    control(GPIO, ESETDIR, EP9_15, EGPIO_DIR_OUTPUT);
 
     while(1)
     {
-        wc.pinValue = 0x1;
-        write(GPIO, AM335X_GPIO1_REGS, &wc);
-
+        /* Turn LED On */
+        write(GPIO, EP9_15, 0x1);
 
         sleep(10);
 
-        wc.pinValue = 0x0;
-        write(GPIO, AM335X_GPIO1_REGS, &wc);
+        /* Turn LED Off */
+        write(GPIO, EP9_15, 0x0);
 
         sleep(5);
     }
 
 	return OK;
-
 }
