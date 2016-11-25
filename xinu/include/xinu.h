@@ -41,3 +41,4 @@
 #include <armv7a.h>
 #include <adc.h>
 #include <gpio.h>
+#include <adxl345.h>

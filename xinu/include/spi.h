@@ -16,11 +16,16 @@ struct	spi_csreg {
 	 volatile uint32 chctrl;	/* Channel control register	*/
 	 volatile uint32 chtx;		/* Channel xmit register	*/
 	 volatile uint32 chrx;		/* Channel receive register	*/
-	} ch[3];
+	} ch[4];
 	volatile uint32 xferlevel;	/* Transfer level register	*/
 	volatile uint32 daftx;		/* FIFO xmit register		*/
 	volatile uint32 dafrx;		/* FIFO receive register	*/
 };
+
+/* SPI Clock control */
+#define AM335X_SPI_CLKCTRL_ADDR	    0x44E0004C
+#define AM335X_SPI_CLKCTRL_EN	    0x00000002
+#define AM335X_SPI_CLKCTRL_EN_MASK  0x00000003
 
 #define	SPI_0_ADDR	0x48030000
 #define	SPI_1_ADDR	0x481A0000

@@ -4,26 +4,17 @@
 
 process	main(void)
 {
+    struct accel_data data = {0, 0, 0};
 	recvclr();
 
-	/* Initialize the GPIO module */
-    init(GPIO);
+	// Init Accel
+	accel_init();
 
-    /* Set the P9-15 pin as output pin */
-    control(GPIO, ESETDIR, EP9_15, EGPIO_DIR_OUTPUT);
+    // Now try to read sensor data
+    accel_read(&data);
 
-    while(1)
-    {
-        /* Turn LED On */
-        write(GPIO, EP9_15, 0x1);
-
-        sleep(10);
-
-        /* Turn LED Off */
-        write(GPIO, EP9_15, 0x0);
-
-        sleep(5);
-    }
+    //display
+    printf("X=%d, Y=%d, Z=%d\n", data.x, data.y, data.z);
 
 	return OK;
 }
