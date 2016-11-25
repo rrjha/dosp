@@ -29,11 +29,7 @@ class Protocol(asyncio.DatagramProtocol):
     if len(b) >= s_size:
       p = b[0:s_size]
       self.bufs[addr] = b[s_size:]
-      try:
-        self.loop.create_task(self.handle(unpack_msg(p), addr))
-      except Exception as e:
-        dp("Caught exception when attempting to handle message from " + addr)
-        dp(e.printStackTrace())
+      self.loop.create_task(self.handle(unpack_msg(p), addr))
 
   def pause_writing(self):
     self.loop.create_task(self.write_lock.acquire())
@@ -43,25 +39,30 @@ class Protocol(asyncio.DatagramProtocol):
 
   async def handle(self, msg, addr):
     m_type = msg["type"]
-    if m_type == mtype.ENTER:
-      dp("Got ENTER from " + addr)
-      db.map_ip(addr)
-    elif m_type == mtype.LEAVE:
-      dp("Got LEAVE from " + addr)
-      db.drop_id(db.get_id(addr))
-    elif m_type == mtype.PUBLISH:
-      dp("Got PUBLISH from " + addr)
-      ips = db.get_subs_ips(msg["topic"])
-      db.log_message(msg)
-      await self.write_lock.acquire()
-      for ip in ips:
-        msg["src"] = db.get_id(addr)
-        self.transport.send(pack_msg(msg), ip)
-        dp("Forwarded message to " + addr)
-      self.write_lock.release()
-    elif m_type == mtype.SUBSCRIBE:
-      dp("Got SUBSCRIBE from " + addr)
-      db.subscribe(db.get_id(addr), msg["topic"])
-    else:
-      dp("Unknown message type")
+    dp(msg)
+    try:
+      if m_type == mtype.ENTER:
+        dp("Got ENTER from " + addr)
+        db.map_ip(addr)
+      elif m_type == mtype.LEAVE:
+        dp("Got LEAVE from " + addr)
+        db.drop_id(db.get_id(addr))
+      elif m_type == mtype.PUBLISH:
+        dp("Got PUBLISH from " + addr)
+        ips = db.get_subs_ips(msg["topic"])
+        db.log_message(msg)
+        await self.write_lock.acquire()
+        for ip in ips:
+          msg["src"] = db.get_id(addr)
+          self.transport.send(pack_msg(msg), ip)
+          dp("Forwarded message to " + addr)
+        self.write_lock.release()
+      elif m_type == mtype.SUBSCRIBE:
+        dp("Got SUBSCRIBE from " + addr)
+        db.subscribe(db.get_id(addr), msg["topic"])
+      else:
+        dp("Unknown message type")
+    except Exception as e:
+      dp("Caught exception while attempting to handle message from " + addr)
+      dp(e.printStackTrace())
 
