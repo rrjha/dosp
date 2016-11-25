@@ -12,8 +12,8 @@ void write_register(byte address, byte value)
     byte tx[2], rx[2];
 
     // Writes are only single byte so MB not needed
-    tx[0] = address & 0x3F;
-    tx[1] = value &0x3F;
+    tx[0] = (address & SB_WRITE_MASK);
+    tx[1] = value;
     adxl_buf.txbuf = &tx[0];
     adxl_buf.rxbuf = &rx[0]; //don't care
     adxl_buf.length = 2;
@@ -27,7 +27,7 @@ byte read_register(byte address)
     byte tx[2] = {0, 0}, rx[2];
 
     // Indicate a read
-    tx[0] = (address & 0x3F) | 0x80;
+    tx[0] = ((address & SB_WRITE_MASK) | READ_MASK);
 
     adxl_buf.txbuf = &tx[0];
     adxl_buf.rxbuf = &rx[0];
@@ -52,10 +52,10 @@ devcall accel_init()
     }
 
     // Set the sensor to +/- 2G mode. Better sensitivity
-    write_register(DATA_FORMAT, 0x0);
+    write_register(DATA_FORMAT, RANGE_2G);
 
     // Now set the power control reg in measurement mode
-    write_register(POWER_CTL, 0x08);
+    write_register(POWER_CTL, MEASURE);
 
     return OK;
 }
@@ -64,7 +64,7 @@ devcall accel_read(struct accel_data *dataPtr)
 {
     byte x0=0, x1=0, y0=0, y1=0, z0=0, z1=0;
 
-    if (devid != 0xE5){
+    if ((devid & 0xFF) != DEVICEID){
         kprintf("Read before Init - Error\n");
         return SYSERR;
     }
