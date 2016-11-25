@@ -16,27 +16,33 @@ void send_tx_data(byte value)
     control(SPI0, SPI_CTRL_TRANSFER, &adxl_buf, 0); // 4th arg is dummy
 }
 
-void read_rx_data(byte* rxstream, int32 length)
+byte read_rx_data()
 {
     struct spi_transfer adxl_buf;
-    byte *txstream = (byte*)getmem(length);
-    memset(txstream, 0, length); // tx for ignore
+    byte tx=0, rx;
 
-    /* We can not verify correctness of length of actual param so just null check */
-    if((rxstream != NULL) && (txstream != NULL)){
-        adxl_buf.txbuf = txstream;
-        adxl_buf.rxbuf = rxstream;
-        adxl_buf.length = length;
-        control(SPI0, SPI_CTRL_TRANSFER, &adxl_buf, 0);
-    }
+    adxl_buf.txbuf = &tx;
+    adxl_buf.rxbuf = &rx; //don't care
+    adxl_buf.length = 1;
 
-    freemem((char*)txstream, length);
+    control(SPI0, SPI_CTRL_TRANSFER, &adxl_buf, 0); // 4th arg is dummy
+
+    return rx;
 }
 
 void write_register(byte address, byte value)
 {
     send_tx_data(address);
     send_tx_data(value);
+}
+
+byte read_register(byte address)
+{
+    byte value;
+    send_tx_data(address);
+    value = read_rx_data();
+
+    return value;
 }
 
 void accel_init()
@@ -53,6 +59,18 @@ void accel_init()
 
 devcall accel_read(struct accel_data *dataPtr)
 {
-    read_rx_data((byte*) dataPtr, sizeof(struct accel_data));
+    byte x0, x1, y0, y1, z0, z1;
+
+    x0 = read_register(DATAX0);
+    x1 = read_register(DATAX1);
+    y0 = read_register(DATAY0);
+    y1 = read_register(DATAY1);
+    z0 = read_register(DATAZ0);
+    z1 = read_register(DATAZ1);
+
+    dataPtr->x = x1 << 8 | x0;
+    dataPtr->y = y1 << 8 | y0;
+    dataPtr->z = z1 << 8 | z0;
+
     return OK;
 }
