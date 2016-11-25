@@ -527,7 +527,7 @@ extern devcall gpiowrite (struct dentry *, uint32, uint32);
 extern devcall gpioread (struct dentry *, uint32, uint32);
 
 /* in file adxl345.c */
-extern void accel_init();
+extern devcall accel_init();
 //extern devcall accel_read(struct accel_data *);
 
 /* in file start.S */
