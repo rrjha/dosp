@@ -44,9 +44,9 @@ devcall accel_init()
     init(SPI0);
 
     // Read the ID
-    devid = read_register(0);
+    devid = read_register(DEVID);
 
-    if((devid & 0xFF) != 0xE5){
+    if((devid & 0xFF) != DEVICEID){
         kprintf("Dev Id returned 0x%X doesn't match\n", devid);
         return SYSERR;
     }

@@ -1,6 +1,7 @@
 /* adxl345.h - ADXL345 definitions */
 
 /* Some useful registers */
+#define DEVID 0x0
 #define POWER_CTL 0x2D	//Power Control Register
 #define DATA_FORMAT 0x31
 #define DATAX0 0x32	//X-Axis Data 0
@@ -9,6 +10,8 @@
 #define DATAY1 0x35	//Y-Axis Data 1
 #define DATAZ0 0x36	//Z-Axis Data 0
 #define DATAZ1 0x37	//Z-Axis Data
+
+#define DEVICEID 0xE5
 
 struct accel_data {
     int16 x;
