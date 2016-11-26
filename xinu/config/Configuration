@@ -118,7 +118,7 @@ gpio:
 		-intr ionull
 
 accel:
-	on top
+	on adxl345
 		-i accel_init	-o ionull	-c ionull
 		-r accel_read   -g ionull	-p ionull
 		-w ionull       -s ionull	-n ionull
@@ -188,6 +188,10 @@ accel:
    /* GPIO */
 
    GPIO is gpio on top csr 0x44E07000
+
+   /* Accel */
+
+   ACCEL is accel on adxl345
 %%
 
 /* Configuration and Size Constants */
