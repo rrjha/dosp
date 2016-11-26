@@ -20,6 +20,7 @@ class Protocol(asyncio.DatagramProtocol):
     self.transport = transport
 
   def datagram_received(self, data, addr):
+    print(data)
     addr = addr[0]
     dp("Got some data from %s" % addr)
     if not addr in self.bufs:
