@@ -213,5 +213,12 @@ struct	dentry	devtab[NDEVS] =
 	  (void *)gpioinit, (void *)ionull, (void *)ionull,
 	  (void *)gpioread, (void *)gpiowrite, (void *)ionull,
 	  (void *)ionull, (void *)ionull, (void *)gpioctl,
-	  (void *)0x44e07000, (void *)ionull, 0 }
+	  (void *)0x44e07000, (void *)ionull, 0 },
+
+/* ACCEL is accel */
+	{ 28, 0, "ACCEL",
+	  (void *)accel_init, (void *)ionull, (void *)ionull,
+	  (void *)accel_read, (void *)ionull, (void *)ionull,
+	  (void *)ionull, (void *)ionull, (void *)ionull,
+	  (void *)0x0, (void *)ionull, 0 }
 };

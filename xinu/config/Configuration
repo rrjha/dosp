@@ -116,6 +116,13 @@ gpio:
 		-r gpioread	    -g ionull	-p ionull
 		-w gpiowrite    -s ionull	-n gpioctl
 		-intr ionull
+
+accel:
+	on adxl345
+		-i accel_init	-o ionull	-c ionull
+		-r accel_read   -g ionull	-p ionull
+		-w ionull       -s ionull	-n ionull
+		-intr ionull
 %%
 
 /* Actual device declarations that each give the name of a device that	*/
@@ -182,6 +189,9 @@ gpio:
 
    GPIO is gpio on top csr 0x44E07000
 
+   /* Accel */
+
+   ACCEL is accel on adxl345
 %%
 
 /* Configuration and Size Constants */

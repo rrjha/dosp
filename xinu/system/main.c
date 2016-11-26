@@ -9,13 +9,13 @@ process	main(void)
     recvclr();
 
     // Init Accel
-    accel_init();
+    init(ACCEL);
 
     while(1) {
         printf("Iteration - %d\n", count++);
 
         // Now try to read sensor data
-        accel_read(&data);
+        read(ACCEL, &data, 0); //ignore count
 
         //display
         printf("X=%d, Y=%d, Z=%d\n\n", data.x, data.y, data.z);

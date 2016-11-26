@@ -526,9 +526,8 @@ extern devcall gpioctl (struct dentry *, uint32, uint32, uint32);
 extern devcall gpiowrite (struct dentry *, uint32, uint32);
 extern devcall gpioread (struct dentry *, uint32, uint32);
 
-/* in file adxl345.c */
-extern devcall accel_init();
-//extern devcall accel_read(struct accel_data *);
+/* In file adxl345.c */
+extern devcall	accel_init (struct	dentry *);
 
 /* in file start.S */
 extern	int32	inb(int32);

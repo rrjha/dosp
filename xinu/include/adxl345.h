@@ -28,4 +28,4 @@ struct accel_data {
     int16 z;
 };
 
-devcall accel_read(struct accel_data *dataPtr);
+extern devcall	accel_read(struct dentry *, struct accel_data *, uint32);
