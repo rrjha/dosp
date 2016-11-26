@@ -16,7 +16,7 @@ struct	spi_csreg {
 	 volatile uint32 chctrl;	/* Channel control register	*/
 	 volatile uint32 chtx;		/* Channel xmit register	*/
 	 volatile uint32 chrx;		/* Channel receive register	*/
-	} ch[3];
+	} ch[4];
 	volatile uint32 xferlevel;	/* Transfer level register	*/
 	volatile uint32 daftx;		/* FIFO xmit register		*/
 	volatile uint32 dafrx;		/* FIFO receive register	*/
