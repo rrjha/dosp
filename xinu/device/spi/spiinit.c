@@ -65,7 +65,7 @@ int32	spiinit (
 
 	/* Set the default frequency and CS level */
 
-	csrptr->ch[0].chconf = SPI_CHCONF_CLKD | SPI_CHCONF_EPOL |
+	csrptr->ch[0].chconf = SPI_CHCONF_PHA | SPI_CHCONF_POL | SPI_CHCONF_CLKD | SPI_CHCONF_EPOL |
 			    (SPI_CHCONF_WL & 0x00000380) |
 			     SPI_CHCONF_DPE1 | SPI_CHCONF_IS |
 			     SPI_CHCONF_FORCE;

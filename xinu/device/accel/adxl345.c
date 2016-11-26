@@ -76,9 +76,9 @@ devcall accel_read(struct accel_data *dataPtr)
     z0 = read_register(DATAZ0);
     z1 = read_register(DATAZ1);
 
-    dataPtr->x = x1 << 8 | x0;
-    dataPtr->y = y1 << 8 | y0;
-    dataPtr->z = z1 << 8 | z0;
+    dataPtr->x = (x1 << 8 | x0) + 8;
+    dataPtr->y = (y1 << 8 | y0) + 15;
+    dataPtr->z = (z1 << 8 | z0) - 230;
 
     return OK;
 }

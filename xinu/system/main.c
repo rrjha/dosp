@@ -5,16 +5,23 @@
 process	main(void)
 {
     struct accel_data data = {0, 0, 0};
-	recvclr();
+    int count = 1;
+    recvclr();
 
-	// Init Accel
-	accel_init();
+    // Init Accel
+    accel_init();
 
-    // Now try to read sensor data
-    accel_read(&data);
+    while(1) {
+        printf("Iteration - %d\n", count++);
 
-    //display
-    printf("X=%d, Y=%d, Z=%d\n", data.x, data.y, data.z);
+        // Now try to read sensor data
+        accel_read(&data);
 
-	return OK;
+        //display
+        printf("X=%d, Y=%d, Z=%d\n\n", data.x, data.y, data.z);
+
+        sleep(3);
+    }
+
+    return OK;
 }
