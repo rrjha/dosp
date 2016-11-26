@@ -28,7 +28,8 @@ def unpack_msg(data):
       i += 1
   msg_dict['data'] = data[i:]
   msg_dict['type'] = mtype(msg_dict['type'])
-  print(msg_dict['class'])
+  print(data)
+  print(msg_dict)
   msg_dict['class'] = ftype(msg_dict['class'])
   return msg_dict
 
