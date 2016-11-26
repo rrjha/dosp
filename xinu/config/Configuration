@@ -116,6 +116,13 @@ gpio:
 		-r gpioread	    -g ionull	-p ionull
 		-w gpiowrite    -s ionull	-n gpioctl
 		-intr ionull
+
+accel:
+	on top
+		-i accel_init	-o ionull	-c ionull
+		-r accel_read   -g ionull	-p ionull
+		-w ionull       -s ionull	-n ionull
+		-intr ionull
 %%
 
 /* Actual device declarations that each give the name of a device that	*/
@@ -181,7 +188,6 @@ gpio:
    /* GPIO */
 
    GPIO is gpio on top csr 0x44E07000
-
 %%
 
 /* Configuration and Size Constants */

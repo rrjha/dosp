@@ -43,3 +43,4 @@
 #include <gpio.h>
 #include <led.h>
 #include <tmp36.h>
+#include <adxl345.h>

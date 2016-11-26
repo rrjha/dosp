@@ -38,7 +38,9 @@ byte read_register(byte address)
     return rx[1];
 }
 
-devcall accel_init()
+devcall	accel_init (
+		 struct	dentry *devptr
+		)
 {
     // Init SPI driver
     init(SPI0);
@@ -60,7 +62,11 @@ devcall accel_init()
     return OK;
 }
 
-devcall accel_read(struct accel_data *dataPtr)
+devcall	accel_read(
+	  struct dentry	*devptr,	/* Entry in device switch table	*/
+	  struct accel_data *dataPtr,			/* 10 bit resoultion X, Y, Z acceleration	*/
+	  uint32	arg 			    /* Unused */
+	)
 {
     byte x0=0, x1=0, y0=0, y1=0, z0=0, z1=0;
 
