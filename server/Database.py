@@ -1,6 +1,7 @@
 
 import sqlite3
 import binascii
+import time
 
 from NAssign import assigner
 from Message import ftype, mtype
@@ -16,7 +17,7 @@ class Database:
 
   """
 
-  tables = ("create table if not exists message(type text, class text, topic text, src integer, data text)",
+  tables = ("create table if not exists message(type text, class text, topic text, src integer, data text, time integer)",
 	    "create table if not exists subscriber(id integer, topic text)",
 	    "create table if not exists ipmap(ip text, id integer)",
 	   )
@@ -46,6 +47,16 @@ class Database:
     self.c.execute("insert into ipmap values(?, ?)", (addr, n))
     self.conn.commit()
     return n
+
+  def dump_map(self):
+    """Dump map table
+
+    >>> db.dump_map()
+    [('192.168.0.1', 0), ('192.168.0.2', 1), ('192.168.0.3', 2)]
+
+    """
+    self.c.execute("select * from ipmap order by id asc")
+    return self.c.fetchall()
 
   def map_exists(self, addr):
     """Check that an address is mapped
@@ -98,15 +109,21 @@ class Database:
     msg_dict['type'] = self.cn(mtype, msg_dict['type'])
     msg_dict['class'] = self.cn(ftype, msg_dict['class'])
     msg_dict['topic'] = self.cn(ftype, msg_dict['topic'])
-    self.c.execute("insert into message values(?,?,?,?,?,?)", (
+    self.c.execute("insert into message values(?,?,?,?,?,?,?)", (
 	msg_dict['type'],
 	msg_dict['class'],
 	msg_dict['group'],
 	msg_dict['topic'],
 	msg_dict['src'],
 	binascii.hexify(msg_dict['data']),
+	int(time.time()),
     ))
     self.conn.commit()
+
+  def dump_recent(self, id, count=10):
+    """Dump recent 'count' messages from 'id'"""
+    self.c.execute("select * from message where id=? order by time dec limit ?", (id, count))
+    return self.c.fetchall()
 
   def subscribe(self, id, topic):
     """Subscribe id to a topic

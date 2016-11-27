@@ -2,8 +2,10 @@
 
 import asyncio
 
-from Protocol import Protocol
+from Protocol import Protocol, db
 from util import dp
+
+from rest import build_app
 
 def main():
   dp("Initializing the event loop")
@@ -16,11 +18,25 @@ def main():
   transport.set_write_buffer_limits(10000, 0)
   dp(transport)
 
+  dp("Building REST API endpoint (TCP)")
+  rest_app = build_app(db)
+  rest_handler = rest_app.make_handler()
+  server_f = loop.create_server(rest_handler, '0.0.0.0', 8080)
+  rest_srv = loop.run_until_complete(server_f)
+  dp(rest_handler)
+
   dp("Entering the event loop")
   try:
     loop.run_forever()
+  except KeyboardInterrupt:
+    pass
   finally:
     transport.close()
+    rest_srv.close()
+    loop.run_until_complete(rest_srv.wait_closed())
+    loop.run_until_complete(rest_app.shutdown())
+    loop.run_until_complete(rest_handler.finish_connections(3.0))
+    loop.run_until_complete(rest_app.cleanup())
     loop.close()
 
 if __name__=='__main__':
