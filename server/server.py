@@ -5,6 +5,12 @@ import asyncio
 from Protocol import Protocol, db
 from util import dp
 
+try:
+  import aiohttp
+except ImportError:
+  print("ERROR! You are missing aiohttp dependency. See README for installation instructions.")
+  exit(1)
+
 from rest import build_app
 
 def main():
