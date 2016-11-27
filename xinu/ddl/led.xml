@@ -44,7 +44,7 @@ is equal to the Reading->Measurement attribute of another physical/virtual senso
 <Method_name>led_init</Method_name>
 <Parameter id="p1" enumeration="false" discrete="true">
 		<Parameter_name>ADC_Pin</Parameter_name>
-		<Parameter_value>P9-8</Parameter_value>
+		<Parameter_value>P9-15</Parameter_value>
 		<Parameter_characterization>0</Parameter_characterization>
 		<Parameter_characterization>46</Parameter_characterization>
 </Parameter>

@@ -62,7 +62,7 @@ is equal to the Reading->Measurement attribute of another physical/virtual senso
 	<Number>Single</Number>
 	<Method_name>read</Method_name>
 	<Parameter id="p2" enumeration="false" discrete="true">
-		<Parameter_name>struct</Parameter_name>
+		<Parameter_name>struct accel_data</Parameter_name>
 		<Parameter_value>accel_d</Parameter_value>
 	</Parameter>
 	<Allowed_status>ALL</Allowed_status>
