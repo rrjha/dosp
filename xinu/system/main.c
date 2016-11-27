@@ -88,6 +88,61 @@ process local_daemon(){
 	chk(__LINE__);
 }
 
+process onboard_app(){
+
+	/*	On board APP use case
+	1. Detect if the temp goes more than a certain threshold, then switch on 
+		AC or fan or whatever
+	2. If an activity is detected, assume user gets up to have water, switch on
+		the lights.
+	Ideally, there will be different actuators for LED and FAN.
+	*/
+
+	init(ADC);
+	led_init(EP9_15);
+	init(ACCEL);
+
+	
+	int mvSample, temp_c,local_temp_threshold,local_accel_threshold;
+	struct accel_data data = {0, 0, 0};
+	
+	read(ADC, &mvSample, 3);
+	temp_c = (mvSample - 500)/10;
+	kprintf("\nTemperature:%d",temp_c);
+	//if temperature is more than 28deg, switch on fan/ac. We switch on LED
+	if(temp_c>local_temp_threshold)
+	{//switch on LED
+		
+	/* Turn LED On */
+        led_on();
+	} else{
+	led_off;
+	}
+
+        
+	sleep(10);
+        /* Turn LED Off */
+	led_off();
+
+
+	//using acell data to switch on lights if there is movement.
+	read(ACCEL, &data, 0); //ignore count
+        //display
+	printf("X=%d, Y=%d, Z=%d\n\n", data.x, data.y, data.z)
+	
+	int av=(data.x+data.y+data.z)/3;
+	if(av>local_accel_threashold)
+	{
+		led_on();
+	} else {
+		led off();
+	}
+
+
+}
+
+
+
 process	main (void) {
 	recvclr();
 
@@ -96,10 +151,17 @@ process	main (void) {
 	print("**************************************\n");
 
 
+	resched_ctrl(DEFER_START);
 	pid32 procA = create(local_daemon,8192,20,"ProcA",0);
 	resume(procA);
+	pid32 oba = resume(create(onboard_app,4096,20,"OnBoardApp",0));
+	resched_ctrl(DEFER_STOP);
 
 
 	chprio(getpid(),2);
+
+
+
+
 	return OK;
 }
