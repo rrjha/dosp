@@ -10,3 +10,4 @@ Requirements
 
 0. i386 Linux to run the provided cross-compiler
 0. Python 3.5
+0. aiohttp, installable via ```pip3 install asiohttp```. You may have to run ```sudo aptitude install python3-pip```
