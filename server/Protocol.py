@@ -51,7 +51,7 @@ class Protocol(asyncio.DatagramProtocol):
       elif m_type == mtype.PUBLISH:
         dp("Got PUBLISH from " + addr)
         ips = db.get_subs_ips(msg["topic"])
-        db.log_message(msg)
+        db.log_msg(msg)
         await self.write_lock.acquire()
         for ip in ips:
           msg["src"] = db.get_id(addr)
