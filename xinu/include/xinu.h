@@ -44,3 +44,11 @@
 #include <led.h>
 #include <tmp36.h>
 #include <adxl345.h>
+
+#include <do_led_init.h>
+#include <do_led_on.h>
+#include <do_led_off.h>
+#include <do_tmp_init.h>
+#include <do_tmp_read.h>
+#include <do_init.h>
+#include <do_read.h>

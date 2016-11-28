@@ -7,6 +7,7 @@ void chk(int line){
 	print ("Line %d: Chk .. \n", line);
 }
 
+/* Message struct to be sent to server */
 typedef struct {
 	uint8 type; 	/* 0 = publish, 1 = subscribe, other values left undefined for future expansions */
 	uint8 class; 	/* Format class of the data field (temp=0, accel=1, sleep=2,...) */
@@ -18,14 +19,16 @@ typedef struct {
 }msg;
 #define MSGLEN 69
 
+/* Stub Message */
 char *buff = "Hello from Xinu";
 
 typedef struct {
-	uint32 x;
-	uint32 y;
-	uint32 z;
+	int32 x;
+	int32 y;
+	int32 z;
 }accel_data;
 
+/* Stub Function */
 accel_data get_accel(){
 	accel_data a;
 	a.x = 5;
@@ -34,6 +37,7 @@ accel_data get_accel(){
 	return a;
 }
 
+/* Stub Function */
 uint32 get_temp(){
 	return 10;
 }
@@ -45,21 +49,22 @@ process local_daemon(){
 	do_accel_init(); do_tmp_init();
 	accel_data accel_prev;
 	accel_prev.x = 0; accel_prev.y = 0; accel_prev.z = 0;
-	uint8 inertia = 3;
+	uint8 inertia = 3; uint8 accel_threshold = 3;
 
 	/* UDP Pipeline init */
 	chk(__LINE__);
-	int32	retval;				/* return value from sys calls	*/
-	//uint32	des_ip = 0xC0A80065;/* destination IP address		*/
-	uint32	des_ip = 0xA9FED067;/* destination IP address		*/
-	uint16	des_port = 5154;	/* destination UDP port			*/
-	int32	msglen;				/* length of outgoing message	*/
-	int32	slot;				/* slot in UDP table 			*/
-	uint16	localport= 6;		/* port number for UDP echo		*/
+	int32	retval;						/* return value from sys calls	*/
+	//uint32	des_ip = 0xC0A80065;	/* destination IP address		*/
+	uint32	des_ip = 0xA9FED067;		/* destination IP address		*/
+	uint16	des_port = 5154;			/* destination UDP port			*/
+	int32	msglen;						/* length of outgoing message	*/
+	int32	slot;						/* slot in UDP table 			*/
+	uint16	localport= 6;				/* port number for UDP echo		*/
 
 	slot = udp_register(des_ip, des_port, localport);
 	if (slot == SYSERR)	{
-		print(stderr, "Could not reserve UDP port with 0x%x:%d & local port:%d\n",des_ip, des_port, localport);
+		print(stderr, "Could not reserve UDP port with 0x%x:%d & local port:%d\n",
+				des_ip, des_port, localport);
 		return 1;
 	}
 	chk(__LINE__);
@@ -97,22 +102,19 @@ process local_daemon(){
 	/* Start Publishing */
 	uint8 timer = 0;
 	uint8 temp_awake = 0;
-	uint8 sleep_flag = 0; //Initially assumed awake
+	uint8 sleep_flag = 0; 					/* Initially assumed awake */
 	while(1){
 		sleep(1); timer++;
-#if 0
-		/* Poll and send temp*/
-		if (timer%100 == 0) {
+
+		/* Poll and send temp every minute*/
+		if (timer%60 == 0) {
 			msg temp_read;
-			temp_read.type = 0;
-			temp_read.group = 0;
+			temp_read.type = 0; temp_read.group = 0;
 			temp_read.src = 255;
-			temp_read.class = 0;
-			temp_read.topic = 0;
+			temp_read.class = 0; temp_read.topic = 0;
 			memset(&temp_read.data, 0, 64);
-			temp_read.data[0] = get_temp();
-			//do_led_init();
-			//do_led_on();
+			int temp_c; do_tmp_read(&temp_c);
+			uint8 local_temp = temp_c; temp_read.data[1] = local_temp;
 
 			uint8 diff = temp_read.data[0]-temp_prev;
 			if (diff < 0)
@@ -128,19 +130,22 @@ process local_daemon(){
 			}
 
 		}
-		//#if 0
-		/* Poll and send accel*/
+
+		/* Poll and send accel every 10 second*/
 		if (timer%10 == 0) {
-			chk(__LINE__)
+			chk(__LINE__);
 			msg accel_read;
-			accel_read.type = 0;
-			accel_read.group = 0;
+			accel_read.type = 0; accel_read.group = 0;
 			accel_read.src = 255;
-			accel_read.class = 1;
-			accel_read.topic = 1;
+			accel_read.class = 1; accel_read.topic = 1;
 			memset(&accel_read.data, 0, 64);
-			accel_data accel = get_accel();
-			accel_read.data[0] = accel.x; accel_read.data[1] = accel.y; accel_read.data[2] = accel.z;
+
+			accel_data accel;
+			do_accel_read(&accel_read);
+			uint8 x = accel.x; accel_read.data[0] = x;
+			uint8 y = accel.y; accel_read.data[1] = y;
+			uint8 z = accel.z; accel_read.data[2] = z;
+
 			uint8 diff = (accel_prev.x + accel_prev.y + accel_prev.z) - (accel.x + accel.y + accel.z);
 
 			if (diff < 0)
@@ -155,8 +160,9 @@ process local_daemon(){
 				}
 			}
 		}
-#endif
-		/* Poll accel at every 10 seconds */
+
+		/* Poll accel at every 10 seconds for generating data
+		 * over 5 minutes for sleep event */
 		if (timer%10 == 0) {
 			chk(__LINE__);
 			accel_data accel;
@@ -167,7 +173,7 @@ process local_daemon(){
 			else
 				temp_awake--;
 
-			/* Generate a sleep event at every 30 seconds */
+			/* Generate a sleep event at every 5minutes Seconds */
 			if (timer%300 == 0){
 				chk(__LINE__);
 				msg sleep_event;
@@ -178,14 +184,23 @@ process local_daemon(){
 				sleep_event.topic = 2;
 				memset(&sleep_event.data, 0, 64);
 
-				if (temp_awake > 0 && sleep_flag == 1){	//person awake and last event was sleep
+				/* person awake and last event was sleep */
+				if (temp_awake > 0 && sleep_flag == 1){
 					chk(__LINE__);
 					sleep_flag = 0;
 
 					/* Data: sleep_flag, current temperature, current accel*/
 					sleep_event.data[0] = sleep_flag;
-					sleep_event.data[1] = get_temp();
-					sleep_event.data[2] = accel.x; sleep_event.data[3] = accel.y; sleep_event.data[4] = accel.z;
+
+					int temp_c; do_tmp_read(&temp_c);
+					uint8 local_temp = temp_c; sleep_event.data[1] = local_temp;
+					print("Temp = %d\n", sleep_event.data[1]);
+
+					uint8 x = accel.x; sleep_event.data[2] = x;
+					uint8 y = accel.y; sleep_event.data[3] = y;
+					uint8 z = accel.z; sleep_event.data[4] = z;
+					print("Accel: x=%d\ty=%d\tz=%d\n", x, y, z);
+
 					retval = udp_send(slot, &sleep_event, MSGLEN);
 					if (retval == SYSERR) {
 						print(stderr, "udp_send failed\n");
@@ -193,16 +208,23 @@ process local_daemon(){
 					}
 				}
 
-				if (temp_awake < 0 && sleep_flag == 0){	//person sleep and last event was awake
+				/* person sleep and last event was awake */
+				if (temp_awake < 0 && sleep_flag == 0){
 					chk(__LINE__);
 					sleep_flag = 1;
 
 					/* Data: sleep_flag, current temperature, current accel*/
 					sleep_event.data[0] = sleep_flag;
-					//sleep_event.data[1] = get_temp();
-					int32 local_temp; do_tmp_read(&local_temp);
-					sleep_event.data[1] = (uint8)local_temp;
-					sleep_event.data[2] = accel.x; sleep_event.data[3] = accel.y; sleep_event.data[4] = accel.z;
+
+					int temp_c; do_tmp_read(&temp_c);
+					uint8 local_temp = temp_c; sleep_event.data[1] = local_temp;
+					print("Temp = %d\n", sleep_event.data[1]);
+
+					uint8 x = accel.x; sleep_event.data[2] = x;
+					uint8 y = accel.y; sleep_event.data[3] = y;
+					uint8 z = accel.z; sleep_event.data[4] = z;
+					print("Accel: x=%d\ty=%d\tz=%d\n", x, y, z);
+
 					retval = udp_send(slot, &sleep_event, MSGLEN);
 					if (retval == SYSERR) {
 						print(stderr, "udp_send failed\n");
