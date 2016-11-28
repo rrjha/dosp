@@ -6,6 +6,8 @@ import time
 from NAssign import assigner
 from Message import ftype, mtype
 
+
+
 class Database:
   """System Database
 
@@ -122,7 +124,7 @@ class Database:
 
   def dump_recent(self, id, count=10):
     """Dump recent 'count' messages from 'id'"""
-    self.c.execute("select * from message where id=? order by time dec limit ?", (id, count))
+    self.c.execute("select * from message where src=? order by time desc limit ?", (id, count))
     return self.c.fetchall()
 
   def subscribe(self, id, topic):
@@ -207,3 +209,4 @@ class Database:
   def __del__(self):
     """Don't rely on this"""
     self.conn.close()
+
