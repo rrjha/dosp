@@ -1,0 +1,1 @@
+int32 do_accel_read(struct *accel_d);

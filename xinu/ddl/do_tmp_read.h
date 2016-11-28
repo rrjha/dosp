@@ -1,0 +1,1 @@
+int32 do_tmp_read(int32 *tmp_c);

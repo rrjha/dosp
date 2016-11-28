@@ -42,6 +42,7 @@ process local_daemon(){
 	print ("Starting Daemon Process .. \n");
 
 	uint8 temp_prev = 0, temp_threshold = 1;
+	do_accel_init(); do_tmp_init();
 	accel_data accel_prev;
 	accel_prev.x = 0; accel_prev.y = 0; accel_prev.z = 0;
 	uint8 inertia = 3;
@@ -158,7 +159,8 @@ process local_daemon(){
 		/* Poll accel at every 10 seconds */
 		if (timer%10 == 0) {
 			chk(__LINE__);
-			accel_data accel = get_accel();
+			accel_data accel;
+			do_accel_read(&accel);
 
 			if ((accel.x + accel.y + accel.z) > inertia)
 				temp_awake++;
@@ -197,7 +199,9 @@ process local_daemon(){
 
 					/* Data: sleep_flag, current temperature, current accel*/
 					sleep_event.data[0] = sleep_flag;
-					sleep_event.data[1] = get_temp();
+					//sleep_event.data[1] = get_temp();
+					int32 local_temp; do_tmp_read(&local_temp);
+					sleep_event.data[1] = (uint8)local_temp;
 					sleep_event.data[2] = accel.x; sleep_event.data[3] = accel.y; sleep_event.data[4] = accel.z;
 					retval = udp_send(slot, &sleep_event, MSGLEN);
 					if (retval == SYSERR) {

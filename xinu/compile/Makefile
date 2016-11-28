@@ -9,6 +9,8 @@
 #########################################################################
 
 COMPILER_ROOT	=	../cross_compiler/bin/arm-none-eabi-
+DDLTOOL		= 	python3
+DDLDIR		= 	../ddl
 PNAME		=	bbb
 PLAT		=	Platform_$(PNAME)
 TOPDIR		=	..
@@ -59,7 +61,7 @@ SFLAGS  = ${INCLUDE}
 
 LDFLAGS = -dn -m armelf -Map xinu.map -T ld.script
 
-all:	xinu
+all:	ddl xinu
 
 #--------------------------------------------------------------------------------
 # Handle generation of a new version string when initialize is recompiled
@@ -142,6 +144,17 @@ clean:
 	@rm -f $(XINU)
 	@rm -f $(XINUBIN)
 	@rm -f $(XINUBOOT)
+
+ddl: do_led do_temp do_accel
+
+do_temp: $(DDLDIR)/tmp36.xml
+		$(DDLTOOL) $(DDLDIR)/parser.py $(DDLDIR)/tmp36.xml
+
+do_led: $(DDLDIR)/led.xml
+		$(DDLTOOL) $(DDLDIR)/parser.py $(DDLDIR)/led.xml
+
+do_accel: $(DDLDIR)/adxl345.xml
+		$(DDLTOOL) $(DDLDIR)/parser.py $(DDLDIR)/adxl345.xml
 
 #--------------------------------------------------------------------------------
 # Locations of source directories and exceptions (.c and .[sS] files to exclude)

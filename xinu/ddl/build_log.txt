@@ -1,0 +1,15 @@
+python3 parser.py led.xml
+I'm main!
+DDL: led.xml
+Output Path: /Users/ankitsingh/project/dosp/xinu/ddl
+Processing completed.
+python3 parser.py tmp36.xml
+I'm main!
+DDL: tmp36.xml
+Output Path: /Users/ankitsingh/project/dosp/xinu/ddl
+Processing completed.
+python3 parser.py adxl345.xml
+I'm main!
+DDL: adxl345.xml
+Output Path: /Users/ankitsingh/project/dosp/xinu/ddl
+Processing completed.
