@@ -1,5 +1,6 @@
 
 import asyncio
+import traceback
 
 from util import dp
 from Message import msg_fmt, unpack_msg, pack_msg, mtype
@@ -65,5 +66,6 @@ class Protocol(asyncio.DatagramProtocol):
         dp("Unknown message type")
     except Exception as e:
       dp("Caught exception while attempting to handle message from " + addr)
-      dp(e.printStackTrace())
+      traceback.print_exc()
+
 

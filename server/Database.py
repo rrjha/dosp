@@ -115,7 +115,7 @@ class Database:
 	msg_dict['group'],
 	msg_dict['topic'],
 	msg_dict['src'],
-	binascii.hexify(msg_dict['data']),
+	binascii.hexlify(msg_dict['data']),
 	int(time.time()),
     ))
     self.conn.commit()
