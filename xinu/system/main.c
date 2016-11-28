@@ -42,8 +42,8 @@ uint32 get_temp(){
 	return 10;
 }
 
-process local_daemon(){
-	print ("Starting Daemon Process .. \n");
+process local_daemon_publish(){
+	print ("Starting Publish Daemon Process .. \n");
 
 	uint8 temp_prev = 0, temp_threshold = 1;
 	do_accel_init(); do_tmp_init();
@@ -83,22 +83,7 @@ process local_daemon(){
 		return 1;
 		//break;
 	}
-#if 0
-	/* type = 1: Subscribe*/
-	msg msg_2nd;
-	msg_2nd.type = 1;
-	msg_2nd.class = 2;
-	msg_2nd.group = 0;
-	msg_2nd.topic = 2;
-	msg_2nd.src = 255;
-	memset(&msg_1st.data, 0, 64);
-	retval = udp_send(slot, &msg_1st, MSGLEN);
-	if (retval == SYSERR) {
-		print(stderr, "udp_send failed\n");
-		return 1;
-		//break;
-	}
-#endif
+
 	/* Start Publishing */
 	uint8 timer = 0;
 	uint8 temp_awake = 0;
@@ -109,9 +94,10 @@ process local_daemon(){
 		/* Poll and send temp every minute*/
 		if (timer%60 == 0) {
 			msg temp_read;
-			temp_read.type = 0; temp_read.group = 0;
+			temp_read.type = 0;							/* 0 corresponds to publish */
+			temp_read.group = 0;
 			temp_read.src = 255;
-			temp_read.class = 0; temp_read.topic = 0;
+			temp_read.class = 0; temp_read.topic = 0;	/* 0 corresponds to TEMP service as defined  in server */
 			memset(&temp_read.data, 0, 64);
 			int temp_c; do_tmp_read(&temp_c);
 			uint8 local_temp = temp_c; temp_read.data[1] = local_temp;
@@ -135,9 +121,10 @@ process local_daemon(){
 		if (timer%10 == 0) {
 			chk(__LINE__);
 			msg accel_read;
-			accel_read.type = 0; accel_read.group = 0;
+			accel_read.type = 0;						/* 0 corresponds to publish */
+			accel_read.group = 0;
 			accel_read.src = 255;
-			accel_read.class = 1; accel_read.topic = 1;
+			accel_read.class = 1; accel_read.topic = 1; /* 1 corresponds to ACCEL service as defined  in server */
 			memset(&accel_read.data, 0, 64);
 
 			accel_data accel;
@@ -238,6 +225,84 @@ process local_daemon(){
 	}
 }
 
+process local_daemon_subscribe () {
+	print ("Starting Subscribe Daemon Process .. \n");
+	do_led_init(EP9_15);
+
+	/* UDP Pipeline init */
+	chk(__LINE__);
+	int32	retval;						/* return value from sys calls	*/
+	uint32	des_ip = 0xA9FED067;		/* destination IP address		*/
+	uint16	des_port = 5155;			/* destination UDP port			*/
+	int32	msglen;						/* length of outgoing message	*/
+	int32	slot;						/* slot in UDP table 			*/
+	uint16	localport= 7;				/* port number for UDP echo		*/
+	int32	delay	= 2000;				/* reception delay in ms		*/
+	char	inbuf[69];					/* buffer for incoming reply	*/
+
+	slot = udp_register(des_ip, des_port, localport);
+	if (slot == SYSERR)	{
+		print(stderr, "Could not reserve UDP port with 0x%x:%d & local port:%d\n",
+				des_ip, des_port, localport);
+		return 1;
+	}
+	chk(__LINE__);
+
+	/* type = 2: Establish Connection with Server*/
+	msg msg_1st;
+	msg_1st.type = 2;
+	msg_1st.class = 0;
+	msg_1st.group = 0;
+	msg_1st.topic = 0;
+	msg_1st.src = 255;
+	memset(&msg_1st.data, 0, 64);
+	retval = udp_send(slot, &msg_1st, MSGLEN);
+	if (retval == SYSERR) {
+		print(stderr, "udp_send failed\n");
+		return 1;
+		//break;
+	}
+
+	/* type = 1: Subscribe with Server*/
+	msg msg_2nd;
+	msg_2nd.type = 1;					/* 1 corresponds to subscribe */
+	msg_2nd.class = 3;					/* 3 corresponds to LED service as defined  in server */
+	msg_2nd.group = 0;
+	msg_2nd.topic = 3;					/* 3 corresponds to LED service as defined  in server */
+	msg_2nd.src = 255;
+	memset(&msg_2nd.data, 0, 64);
+	retval = udp_send(slot, &msg_2nd, MSGLEN);
+	if (retval == SYSERR) {
+		print(stderr, "udp_send failed\n");
+		return 1;
+		//break;
+	}
+
+	/* Wait for Data */
+	char toggle_flag = '0'; 		/* Assumed initially Off*/
+	while (1) {
+		retval = udp_recv(slot, inbuf, sizeof(inbuf), delay);
+		if (retval == TIMEOUT) {
+			fprintf(stderr, "%s: timeout...\n");
+			continue;
+		} else if (retval == SYSERR) {
+			fprintf(stderr, "%s: error from udp_recv \n");
+			return 1;
+		}
+
+		if (inbuf[5] == '1') {
+			if (toggle_flag == '0') {
+				do_led_on();
+				toggle_flag = '1';
+			}
+			else {
+				do_led_off();
+				toggle_flag = '0';
+			}
+		}
+	}
+}
+
 process	main (void) {
 	recvclr();
 
@@ -246,10 +311,10 @@ process	main (void) {
 	print("**************************************\n");
 
 
-	pid32 procA = create(local_daemon,8192,20,"ProcA",0);
+	pid32 procA = create(local_daemon_publish,8192,20,"ProcA",0);
 	resume(procA);
 
-
+	pid32 procB = create(local_daemon_subscribe, 8192, 20, "ProcB", 0);
 	chprio(getpid(),2);
 	return OK;
 }
