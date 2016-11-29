@@ -28,6 +28,10 @@ class DataListing:
 #Configuration
 server = "http://127.0.0.1:8080/"
 
+def led_example():
+  r = requests.post(server + "json", data='{"type": 3, "target": "192.168.0.1"}'.encode('utf-8'))
+  #LED turned on!
+
 def main():
   """Main demonstration function"""
   #Check that the server is running
@@ -50,9 +54,9 @@ def main():
     print(msgs)
 
   #Extract messages numerically for each id
-  temperature_lists = {id: [] for id in addr, id in d.items()}
-  accel_lists = {id: [] for id in addr, id in d.items()}
-  sleep_lists = {id: [] for id in addr, id in d.items()}
+  temperature_lists = {(id, []) for addr, id in d.items()}
+  accel_lists = {(id, []) for addr, id in d.items()}
+  sleep_lists = {(id, []) for addr, id in d.items()}
   for addr, id in d.items():
     for msg in messages_by_id[id]:
       data = msg['data']
@@ -60,7 +64,7 @@ def main():
       if c == "TEMP":
         temperature_lists[id].append(data[0])
       elif c == "ACCEL":
-        accel_lists[id].append((data[0], data[1], data[2])
+        accel_lists[id].append((data[0], data[1], data[2]))
       elif c == "SLEEP":
         sleep_lists[id].append(data[0])
       else:

@@ -1,12 +1,16 @@
 
 import json
+import socket
 from enum import Enum
 
 from aiohttp import web
 
+import Protocol
+
 from util import dp
 
 db = None
+loop = None
 
 async def hello(request):
   return web.Response(text="Hello World!")
@@ -33,6 +37,12 @@ async def handle(request):
     else:
       count = d['count']
     a = db.dump_recent(d['id'], count)
+  elif rt == RequestType.LEDPUB:
+    a = db.dump_map()
+    tip = d['target']
+    sock = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+    sock.sendto(bytearray([0, 3, 0, 3, 0, 1].extend([0 for _ in range(63)])), (tip, 5154))
   else:
     a = "Unknown RequestType"
   return web.Response(text=json.dumps(a))
@@ -42,9 +52,11 @@ rest_app.router.add_get('/', hello)
 resource = rest_app.router.add_resource('/json')
 resource.add_route('*', handle)
 
-def build_app(adb):
+def build_app(adb, aloop):
   global db
+  global loop
   db = adb
+  loop = aloop
   return rest_app
 
 class RequestType(Enum):

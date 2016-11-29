@@ -25,7 +25,7 @@ def main():
   dp(transport)
 
   dp("Building REST API endpoint (TCP)")
-  rest_app = build_app(db)
+  rest_app = build_app(db, loop)
   rest_handler = rest_app.make_handler()
   server_f = loop.create_server(rest_handler, '0.0.0.0', 8080)
   rest_srv = loop.run_until_complete(server_f)
