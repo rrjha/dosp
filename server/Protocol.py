@@ -18,7 +18,9 @@ class Protocol(asyncio.DatagramProtocol):
 
   def connection_made(self, transport):
     """Passes in the transport from asyncio, otherwise vestigial because UDP is connectionless"""
+    global d_transport
     self.transport = transport
+    d_transport = transport
 
   def datagram_received(self, data, addr):
     addr = addr[0]

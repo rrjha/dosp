@@ -68,3 +68,4 @@ class RequestType(Enum):
   ECHO = 0 #Responds with empty JSON
   LIST = 1 #Dictionary of {'id': 'ip_addr'} pairs
   RECENT = 2 #Include 'count' field in query, default 10. Needs 'id' field. Returns msg_dict JSON array
+  LEDPUB = 3
