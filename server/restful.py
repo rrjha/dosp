@@ -20,11 +20,6 @@ class RequestType(Enum):
   LIST = 1
   RECENT = 2
 
-#Data listing structure
-class DataListing:
-  def __init__():
-    pass
-
 #Configuration
 server = "http://127.0.0.1:8080/"
 
@@ -57,7 +52,8 @@ def main():
   temperature_lists = {(id, []) for addr, id in d.items()}
   accel_lists = {(id, []) for addr, id in d.items()}
   sleep_lists = {(id, []) for addr, id in d.items()}
-  for addr, id in d.items():
+  id_list = [id for addr, id in d.items()]
+  for id in id_list:
     for msg in messages_by_id[id]:
       data = msg['data']
       c = msg['class']
