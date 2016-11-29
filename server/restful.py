@@ -55,7 +55,7 @@ def main():
   id_list = [id for addr, id in d.items()]
   for id in id_list:
     for msg in messages_by_id[id]:
-      data = msg['data']
+      data = bytearray.fromhex(msg['data'])
       c = msg['class']
       if c == "TEMP":
         temperature_lists[id].append(data[0])

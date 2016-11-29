@@ -125,7 +125,7 @@ class Database:
   def dump_recent(self, id, count=10):
     """Dump recent 'count' messages from 'id'"""
     self.c.execute("select * from message where src=? order by time desc limit ?", (id, count))
-    return self.c.fetchall()
+    f = self.c.fetchall()
 
   def subscribe(self, id, topic):
     """Subscribe id to a topic
