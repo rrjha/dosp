@@ -111,10 +111,9 @@ class Database:
     msg_dict['type'] = self.cn(mtype, msg_dict['type'])
     msg_dict['class'] = self.cn(ftype, msg_dict['class'])
     msg_dict['topic'] = self.cn(ftype, msg_dict['topic'])
-    self.c.execute("insert into message values(?,?,?,?,?,?,?)", (
+    self.c.execute("insert into message values(?,?,?,?,?,?)", (
 	msg_dict['type'],
 	msg_dict['class'],
-	msg_dict['group'],
 	msg_dict['topic'],
 	msg_dict['src'],
 	binascii.hexlify(msg_dict['data']),
@@ -126,6 +125,7 @@ class Database:
     """Dump recent 'count' messages from 'id'"""
     self.c.execute("select * from message where src=? order by time desc limit ?", (id, count))
     f = self.c.fetchall()
+    return f
 
   def subscribe(self, id, topic):
     """Subscribe id to a topic

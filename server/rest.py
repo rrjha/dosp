@@ -36,13 +36,19 @@ async def handle(request):
       count = 10
     else:
       count = d['count']
-    a = db.dump_recent(d['id'], count)
+    a = list(db.dump_recent(d['id'], count))
+    for i in range(len(a)):
+      a[i] = list(a[i])
+    for item in a:
+      item[4] = item[4].decode('utf-8')
   elif rt == RequestType.LEDPUB:
     a = db.dump_map()
     tip = d['target']
     sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-    sock.sendto(bytearray([0, 3, 0, 3, 0, 1].extend([0 for _ in range(63)])), (tip, 5154))
+    sock.bind(("0.0.0.0", 5155))
+    sock.sendto(bytearray([0, 3, 0, 3, 0, 1] + [0 for _ in range(63)]), (tip, 5155))
+    a = {}
   else:
     a = "Unknown RequestType"
   return web.Response(text=json.dumps(a))
