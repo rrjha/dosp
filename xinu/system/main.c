@@ -2,6 +2,7 @@
 
 #include <xinu.h>
 #include <stdlib.h>
+typedef char int8;
 
 void chk(int line){
 	print ("Line %d: Chk .. \n", line);
@@ -51,13 +52,13 @@ process local_daemon_publish(){
 	do_accel_init(); do_tmp_init();
 	accel_data accel_prev;
 	accel_prev.x = 0; accel_prev.y = 0; accel_prev.z = 0;
-	uint8 inertia = 3; uint8 accel_threshold = 3;
+	uint8 inertia = 6; uint8 accel_threshold = 3;
 
 	/* UDP Pipeline init */
 	chk(__LINE__);
 	int32	retval;						/* return value from sys calls	*/
 	//uint32	des_ip = 0xC0A80065;	/* destination IP address		*/
-	uint32	des_ip = 0xC0A80064;		/* destination IP address		*/
+	uint32	des_ip = 0xC0A80066;		/* destination IP address		*/
 	uint16	des_port = 5154;			/* destination UDP port			*/
 	uint16	subscribe_port = 5155;
 	int32	msglen;						/* length of outgoing message	*/
@@ -113,7 +114,7 @@ process local_daemon_publish(){
 	/* Start Publishing */
 	uint8 timer = 0;
 	uint8 temp_awake = 0;
-	uint8 sleep_flag = 0; 					/* Initially assumed awake */
+	uint8 sleep_flag = 1; 					/* Initially assumed awake */
 	while(1){
 		sleep(1); timer++;
 
@@ -155,11 +156,12 @@ process local_daemon_publish(){
 			memset(&accel_read.data, 0, 64);
 
 			accel_data accel;
-			do_accel_read(&accel_read);
-			uint8 x = accel.x; accel_read.data[0] = x;
-			uint8 y = accel.y; accel_read.data[1] = y;
-			uint8 z = accel.z; accel_read.data[2] = z;
-			print("Accel: x=%d\ty=%d\tz=%d\n");
+			do_accel_read(&accel);
+			//print("Accel acquired: x=%d\ty=%d\tz=%d\n",accel.x & 0xFF, accel.y & 0xFF, accel.z & 0xFF);
+			int8 x = accel.x & 0xFF; accel_read.data[0] = x - 252;
+			int8 y = accel.y & 0xFF; accel_read.data[1] = y;
+			int8 z = accel.z & 0xFF; accel_read.data[2] = z+1;
+			//print("Accel: x=%d\ty=%d\tz=%d\n", x, y, z);
 			uint8 diff = (accel_prev.x + accel_prev.y + accel_prev.z) - (accel.x + accel.y + accel.z);
 
 			if (diff < 0)
@@ -174,22 +176,25 @@ process local_daemon_publish(){
 				}
 			//}
 		}
-#if 0
+
 		/* Poll accel at every 10 seconds for generating data
 		 * over 5 minutes for sleep event */
 		if (timer%10 == 0) {
 			chk(__LINE__);
 			accel_data accel;
 			do_accel_read(&accel);
+			//print("Accel acquired: x=%d\ty=%d\tz=%d\n",accel.x & 0xFF, accel.y & 0xFF, accel.z & 0xFF);
 
-			if ((accel.x + accel.y + accel.z) > inertia)
+
+			if ((accel.x - 252 + accel.y + accel.z+1) > inertia)
 				temp_awake++;
 			else
 				temp_awake--;
 
 			/* Generate a sleep event at every 5minutes Seconds */
-			if (timer%300 == 0){
+			if (timer%30 == 0){
 				chk(__LINE__);
+
 				msg sleep_event;
 				sleep_event.type = 0;
 				sleep_event.group = 0;
@@ -199,7 +204,8 @@ process local_daemon_publish(){
 				memset(&sleep_event.data, 0, 64);
 
 				/* person awake and last event was sleep */
-				if (temp_awake > 0 && sleep_flag == 1){
+				if (temp_awake > 0/* && sleep_flag == 1*/){
+					print("temp_awake count = %d and sleep_flag = %d\n", temp_awake, sleep_flag);
 					chk(__LINE__);
 					sleep_flag = 0;
 
@@ -210,10 +216,10 @@ process local_daemon_publish(){
 					uint8 local_temp = temp_c; sleep_event.data[1] = local_temp;
 					print("Temp = %d\n", sleep_event.data[1]);
 
-					uint8 x = accel.x; sleep_event.data[2] = x;
-					uint8 y = accel.y; sleep_event.data[3] = y;
-					uint8 z = accel.z; sleep_event.data[4] = z;
-					print("Accel: x=%d\ty=%d\tz=%d\n", x, y, z);
+					uint8 x = accel.x & 0xFF; sleep_event.data[2] = x-252;
+					uint8 y = accel.y & 0xFF; sleep_event.data[3] = y;
+					uint8 z = accel.z & 0xFF; sleep_event.data[4] = z+1;
+					//print("Accel (in sleep event): x=%d\ty=%d\tz=%d\n", x, y, z);
 
 					retval = udp_send(slot, &sleep_event, MSGLEN);
 					if (retval == SYSERR) {
@@ -221,9 +227,9 @@ process local_daemon_publish(){
 						return 1;
 					}
 				}
-
+//#if 0
 				/* person sleep and last event was awake */
-				if (temp_awake < 0 && sleep_flag == 0){
+				if (temp_awake < 0 /*&& sleep_flag == 0*/){
 					chk(__LINE__);
 					sleep_flag = 1;
 
@@ -234,10 +240,10 @@ process local_daemon_publish(){
 					uint8 local_temp = temp_c; sleep_event.data[1] = local_temp;
 					print("Temp = %d\n", sleep_event.data[1]);
 
-					uint8 x = accel.x; sleep_event.data[2] = x;
-					uint8 y = accel.y; sleep_event.data[3] = y;
-					uint8 z = accel.z; sleep_event.data[4] = z;
-					print("Accel: x=%d\ty=%d\tz=%d\n", x, y, z);
+					uint8 x = accel.x & 0xFF; sleep_event.data[2] = x;
+					uint8 y = accel.y & 0xFF; sleep_event.data[3] = y;
+					uint8 z = accel.z & 0xFF; sleep_event.data[4] = z;
+					//print("Accel (in sleep event): x=%d\ty=%d\tz=%d\n", x, y, z);
 
 					retval = udp_send(slot, &sleep_event, MSGLEN);
 					if (retval == SYSERR) {
@@ -245,11 +251,12 @@ process local_daemon_publish(){
 						return 1;
 					}
 				}
+//#endif
 				temp_awake = 0;
 			}
 
 		}
-#endif
+
 	}
 }
 
@@ -267,9 +274,9 @@ process local_daemon_subscribe () {
 	char toggle_flag = '0'; 		/* Assumed initially Off*/
 	chk(__LINE__);
 	while (1) {
-		chk(__LINE__);
+		//chk(__LINE__);
 		retval = udp_recv(slot_subscribe, inbuf, sizeof(inbuf), delay);
-		chk(__LINE__);
+		//chk(__LINE__);
 		if (retval == TIMEOUT) {
 			//fprintf(stderr, "%s: timeout...\n");
 			continue;
@@ -280,12 +287,12 @@ process local_daemon_subscribe () {
 
 		if (inbuf[5] == 1) {
 			if (toggle_flag == '0') {
-				//do_led_on();
+				do_led_on();
 				print("LED ON..\n");
 				toggle_flag = '1';
 			}
 			else {
-				//do_led_off();
+				do_led_off();
 				print ("LED OFF .. \n");
 				toggle_flag = '0';
 			}
