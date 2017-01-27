@@ -1,9 +1,7 @@
 Introduction
 ============
 
-DOS COP5615 Term Project
-
-Modified Xinu for BBB
+Sleep pilot helps monitor sleep quality and control the surrounding
 
 Requirements
 ============
